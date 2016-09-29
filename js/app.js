@@ -1,4 +1,3 @@
-
 var $ = require('jquery');
 
 var Papa = require('papaparse');
@@ -56,44 +55,51 @@ var info = L.control();
 var mapitRoute = 'https://mapit.mysociety.org/postcode/:pcode.json?generation=:gen';
 
 $('#postcode-button')
-	.click(function() {
-		postcodeFinder();
-	});
+    .click(function() {
+        postcodeFinder();
+    });
 
 $('#postcode-input')
-	.keypress(function(e) {
-		if (e.which == '13') {
-			postcodeFinder();
-		}
-	});
+    .keypress(function(e) {
+        if (e.which == '13') {
+            postcodeFinder();
+        }
+    });
 
 function postcodeFinder() {
+		$('#postcode-input-group').removeClass('has-error has-feedback').tooltip('hide');
+    var value = $('#postcode-input').val().replace(/\s/g, ""),
+        regex = /[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}/i,
+        query = mapitRoute.replace(":pcode", value).replace(":gen", 29);
+    if (regex.test(value) === false) {
+        $('#postcode-input-group').addClass('has-error has-feedback').attr('data-toggle', 'tooltip').attr('data-placement', 'top').attr('title', 'Invalid Postcode. Must start with "BT"').tooltip('show');
+    } else {
+        $('#postcode-input-group').removeClass('has-error has-feedback').tooltip('hide');
+        $.getJSON(query, function(data) {
+                var areas = data.areas;
+                L.marker([data.wgs84_lat, data.wgs84_lon]).addTo(proposedMap);
+                proposedMap.flyTo(new L.latLng(data.wgs84_lat, data.wgs84_lon), 10);
+                $.each(areas, function(key, value) {
+                    if (value.type == 'WMC') {
+                        var wmcGSS = value.codes.gss;
+                        clearMap();
+                        addGeoLayer(proposedMap, 'data/current/' + wmcGSS + '.json', oldConstituencyStyle, null);
+                        $('#which-constituencies').show(400).html('<h3><small>Old Constituency: </small>' + value.name + ' (green)</h3>');
+                    }
+                    if (value.type == 'LGW') {
+                        var lgwGSS = value.codes.gss;
+                        findNewWard(lgwGSS);
+                    }
+                });
 
-	    var value = $('#postcode-input').val().replace(/\s/g, ""),
-	        regex = /[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}/i,
-	        query = mapitRoute.replace(":pcode", value).replace(":gen", 29);
-	    if (regex.test(value) == false) {
-	        $('#postcode-input-group').addClass('has-error has-feedback').attr('data-toggle', 'tooltip').attr('data-placement', 'top').attr('title', 'Invalid Postcode').tooltip('show');
-	    } else {
-	        $('#postcode-input-group').removeClass('has-error has-feedback').tooltip('hide');
-	    }
-	    $.getJSON(query, function(data) {
-	        var areas = data.areas;
-	        L.marker([data.wgs84_lat, data.wgs84_lon]).addTo(proposedMap);
-	        proposedMap.flyTo(new L.latLng(data.wgs84_lat, data.wgs84_lon), 10);
-	        $.each(areas, function(key, value) {
-	            if (value.type == 'WMC') {
-	                var wmcGSS = value.codes.gss;
-	                clearMap();
-	                addGeoLayer(proposedMap, 'data/current/' + wmcGSS + '.json', oldConstituencyStyle, null);
-	                $('#which-constituencies').show(400).html('<h3><small>Old Constituency: </small>' + value.name + ' (green)</h3>');
-	            }
-	            if (value.type == 'LGW') {
-	                var lgwGSS = value.codes.gss;
-	                findNewWard(lgwGSS);
-	            }
-	        });
-	    });
+            })
+            .fail(function() {
+                $('#postcode-input-group').addClass('has-error has-feedback').attr('data-toggle', 'tooltip').attr('data-placement', 'top').attr('title', 'Could not find a location for this entry.').tooltip('show');
+            })
+            .error(function() {
+                $('#postcode-input-group').addClass('has-error has-feedback').attr('data-toggle', 'tooltip').attr('data-placement', 'top').attr('title', 'Could not find a result for this postcode').tooltip('show');
+            });
+    }
 }
 
 info.onAdd = function(map) {
@@ -172,15 +178,15 @@ function addWardLayer(map, id) {
     });
     geojsonLayer.addTo(map);
     $("#reset-div").html('<a id="reset-button" class="btn btn-primary btn-lg pull-right" role="button">Reset Map</a>');
-		$("#reset-button").on({
-			click: mapReset
-		});
+    $("#reset-button").on({
+        click: mapReset
+    });
 }
 
-function mapReset () {
-	clearMap();
-	addConstituencyBounds();
-	proposedMap.flyTo(new L.LatLng(54.6071, -6.3247), 8);
+function mapReset() {
+    clearMap();
+    addConstituencyBounds();
+    proposedMap.flyTo(new L.LatLng(54.6071, -6.3247), 8);
 }
 
 function onEachFeature(feature, layer) {
@@ -234,7 +240,7 @@ function tileLayers(map) {
     var northEast = L.latLng(55.3166, -8.2919),
         southWest = L.latLng(54, -5.327),
         bounds = L.latLngBounds(southWest, northEast);
-		L.tileLayer.provider('Stamen.Terrain').addTo(map);
+    L.tileLayer.provider('Stamen.Terrain').addTo(map);
     map.setMaxBounds(bounds);
     map.setMaxZoom();
 }
@@ -297,10 +303,10 @@ function findNewWard(gss) {
                     genereateConstituencyStats(id);
                     addGeoLayer(proposedMap, 'data/proposed/' + id + '.json', newConstituencyStyle, onEachFeature);
                     loadWards(id, "data/proposed_wards.csv", proposedWardsAccordion);
-										$("#reset-div").html('<a id="reset-button" class="btn btn-primary btn-lg pull-right" role="button">Reset Map</a>');
-										$("#reset-button").on({
-											click: mapReset
-										});
+                    $("#reset-div").html('<a id="reset-button" class="btn btn-primary btn-lg pull-right" role="button">Reset Map</a>');
+                    $("#reset-button").on({
+                        click: mapReset
+                    });
                 }
             });
         }
@@ -334,12 +340,12 @@ function loadWards(id, filepath, accordion) {
             }
             document.getElementById("wards-panel-info").innerHTML += '<div class="panel-footer">The Boundary Review is required to use the Ward boundaries in force for the most recent local government elections to draw proposed constituencies. In Northern Ireland these are the 2012 Ward boundaries (of which there are 462 Wards in total). Note that these differ from the wards that match to the <em>current</em> Parliamentary Constituencies, known as the 1992 Ward boundaries (of which there are 582).</div>';
 
-						$('#wards-panel-body').append('<a id="show-wards" href="#"> Show Wards on map</a>');
-						$('#show-wards')
-							.click(function() {
-								addWardLayer(proposedMap, id)
-							})
-						return $('#show-wards');
+            $('#wards-panel-body').append('<a id="show-wards" href="#"> Show Wards on map</a>');
+            $('#show-wards')
+                .click(function() {
+                    addWardLayer(proposedMap, id)
+                })
+            return $('#show-wards');
         }
     });
 }
@@ -361,7 +367,7 @@ function selectConstituency(id, istrue) {
 
 function initialize() {
     tileLayers(proposedMap);
-		addConstituencyBounds();
+    addConstituencyBounds();
     info.addTo(proposedMap);
 }
 
