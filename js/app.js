@@ -53,7 +53,7 @@ var proposedMap = new L.map('map-proposed', {
 
 var info = L.control();
 
-var mapitRoute = 'http://mapit.mysociety.org/postcode/:pcode.json?generation=:gen';
+var mapitRoute = 'https://mapit.mysociety.org/postcode/:pcode.json?generation=:gen';
 
 $('#postcode-button')
 	.click(function() {
