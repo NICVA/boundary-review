@@ -1,0 +1,44 @@
+{
+  "name": "boundary-review-2018",
+  "version": "1.0.0",
+  "description": "exploring the proposed changes to Northern Ireland constituency boundaries",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify js/app.js | uglifyjs > build/app.js"
+  },
+  "keywords": [
+    "Northern",
+    "Ireland",
+    "constituency",
+    "boundaries",
+    "boundary",
+    "commission",
+    "2018",
+    "review",
+    "consultation",
+    "parliament",
+    "Assembly",
+    "proposed",
+    "provisional"
+  ],
+  "author": "Bob Harper",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.1.1",
+    "leaflet": "^1.0.0",
+    "leaflet-ajax": "^2.0.0",
+    "leaflet-providers": "^1.1.15",
+    "papaparse": "^4.1.2"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "express": "^4.14.0",
+    "uglify-js": "^2.7.3"
+  },
+  "respository": {
+    "type": "git",
+    "url": "https://github.com/NICVA/boundary-review.git"
+  }
+}

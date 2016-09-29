@@ -1,0 +1,31 @@
+@import 'bootstrap.min.css';
+@import 'leaflet.css';
+@import url('https://fonts.googleapis.com/css?family=Arimo');
+
+#content {
+	margin: auto;
+	max-width: 1000px;
+	text-align: center;
+}
+
+.map {
+	height: 400px;
+	width: 100%;
+}
+
+.panel-group {
+	text-align: left;
+}
+
+.map-info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.map-info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
