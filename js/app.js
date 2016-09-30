@@ -67,7 +67,7 @@ $('#postcode-input')
     });
 
 function postcodeFinder() {
-		$('#postcode-input-group').removeClass('has-error has-feedback').tooltip('hide');
+    $('#postcode-input-group').removeClass('has-error has-feedback').tooltip('hide');
     var value = $('#postcode-input').val().replace(/\s/g, ""),
         regex = /[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}/i,
         query = mapitRoute.replace(":pcode", value).replace(":gen", 29);
@@ -84,7 +84,7 @@ function postcodeFinder() {
                         var wmcGSS = value.codes.gss;
                         clearMap();
                         addGeoLayer(proposedMap, 'data/current/' + wmcGSS + '.json', oldConstituencyStyle, null);
-                        $('#which-constituencies').show(400).html('<h3><small>Old Constituency: </small>' + value.name + ' (green)</h3>');
+                        $('#which-constituencies').show(400).html('<h3><small>Current Constituency: </small>' + value.name + ' (green)</h3>');
                     }
                     if (value.type == 'LGW') {
                         var lgwGSS = value.codes.gss;
@@ -158,20 +158,16 @@ function resetHighlight(e) {
 }
 
 function addGeoLayer(map, filepath, style, onEachFeature) {
-
     window.geojsonLayer = new L.GeoJSON.AJAX(filepath, {
         style: style,
         onEachFeature: onEachFeature
     });
-
     geojsonLayer.addTo(map);
-
 }
 
 function addWardLayer(map, id) {
     clearMap();
     var filepath = 'data/proposed/wards/' + id + '.json';
-    console.log(filepath);
     window.geojsonLayer = new L.GeoJSON.AJAX(filepath, {
         style: wardsStyle,
         onEachFeature: onEachFeatureWards
@@ -209,7 +205,6 @@ function handleLayer(layer) {
 }
 
 function csvJSON(csv) {
-
     var lines = csv.split("\n");
     var result = [];
     var headers = lines[0].split(",");
@@ -222,11 +217,8 @@ function csvJSON(csv) {
         for (var j = 0; j < headers.length; j++) {
             obj[headers[j]] = currentline[j];
         }
-
         result.push(obj);
-
     }
-
     //return result; //JavaScript object
     return console.log(JSON.stringify(result)); //JSON
 }
@@ -246,12 +238,10 @@ function tileLayers(map) {
 }
 
 function loadConstituencies(filepath) {
-
     Papa.parse(filepath, {
         download: true,
         header: true,
         complete: function(results) {
-            console.log("Finished constituencies:", results.data);
             var constituencies = results.data;
             fillConstituencyDropdown(constituencies);
         }
@@ -270,7 +260,6 @@ function genereateConstituencyStats(id, constituencies) {
             for (i = 0; i < constituencies.length; i++) {
                 var constituency = constituencies[i];
                 if (constituency.constituencycode == id) {
-                    console.log(constituency);
                     document.getElementById('panel-proposed').innerHTML = '<h3>' + constituency.constituencyname + ' <span class="badge">' + constituency.electors + ' electors</span></h3></br><h5><strong><abbr title="The number of electors difference with the mandated UK quota">Difference with UK quota</abbr></strong> ' + constituency.diff + '</h5><h5><strong><abbr title="The percentage difference of the number of electors with the mandated UK quota. The maximum is +/- 5%">Percentage Difference</abbr></strong> ' + constituency.percentdiff + '%</h5>';
                 }
             }
@@ -279,7 +268,6 @@ function genereateConstituencyStats(id, constituencies) {
 }
 
 function fillConstituencyDropdown(constituencies) {
-
     for (i = 0; i < constituencies.length; i++) {
         var constituency = constituencies[i];
         var constituencycode = constituency.constituencycode;
@@ -314,21 +302,21 @@ function findNewWard(gss) {
 }
 
 function loadWards(id, filepath, accordion) {
-
     Papa.parse(filepath, {
         download: true,
         header: true,
         complete: function(results) {
-            console.log("Finished wards:", results.data);
             var wards = results.data;
 
             var accordionHTML = '<div class="panel panel-info" id="wards-panel-info">					<div class="panel-heading" role="tab" id="headingOne">					  <h4 class="panel-title">						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">						  Wards in <span id="constituency-name"></span>	(click to expand)				</a> 					  </h4>				</div>		<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">			<div class="panel-body" id="wards-panel-body"></div>				  <div class="list-group" id="wards-list">	  </div>					</div>				  </div>';
             accordion.html(accordionHTML);
 
+            window.wardsArray = [];
             var count = 0;
             for (var i = 0; i < wards.length; i++) {
                 var ward = wards[i];
                 if (ward.constituencycode == id) {
+                    window.wardsArray.push(ward);
                     count += 1;
                     $('#constituency-name').html(ward.constituencyname + ' <span class="badge pull-right">' + count + ' wards</span>');
                     if (ward.electors) {
@@ -340,12 +328,19 @@ function loadWards(id, filepath, accordion) {
             }
             document.getElementById("wards-panel-info").innerHTML += '<div class="panel-footer">The Boundary Review is required to use the Ward boundaries in force for the most recent local government elections to draw proposed constituencies. In Northern Ireland these are the 2012 Ward boundaries (of which there are 462 Wards in total). Note that these differ from the wards that match to the <em>current</em> Parliamentary Constituencies, known as the 1992 Ward boundaries (of which there are 582).</div>';
 
-            $('#wards-panel-body').append('<a id="show-wards" href="#"> Show Wards on map</a>');
+            $('#wards-panel-body').append('<a id="show-wards" href="#"> Show Wards on map</a> / <a id="download-wards" href="#">Download Wards (Chrome only)</a>');
+						$('#download-wards')
+                .click(function() {
+                    downloadCSV({
+                        filename: window.wardsArray[0].constituencyname.replace(/\s/g,'-') + "-wards.csv"
+                    })
+                })
+
             $('#show-wards')
                 .click(function() {
                     addWardLayer(proposedMap, id)
                 })
-            return $('#show-wards');
+            return [$('#show-wards'), $('#download-wards')]
         }
     });
 }
@@ -383,6 +378,57 @@ function addConstituencyBounds() {
     for (i = 1; i < 18; i++) {
         addGeoLayer(proposedMap, 'data/proposed/' + i + '.json', layerStyle, onEachFeature);
     }
+}
+
+function convertArrayOfObjectsToCSV(args) {
+    var result, ctr, keys, columnDelimiter, lineDelimiter, data;
+
+    data = args.data || null;
+    if (data == null || !data.length) {
+        return null;
+    }
+
+    columnDelimiter = args.columnDelimiter || ',';
+    lineDelimiter = args.lineDelimiter || '\n';
+
+    keys = Object.keys(data[0]);
+
+    result = '';
+    result += keys.join(columnDelimiter);
+    result += lineDelimiter;
+
+    data.forEach(function(item) {
+        ctr = 0;
+        keys.forEach(function(key) {
+            if (ctr > 0) result += columnDelimiter;
+
+            result += item[key];
+            ctr++;
+        });
+        result += lineDelimiter;
+    });
+
+    return result;
+}
+
+function downloadCSV(args) {
+    var data, filename, link;
+    var csv = convertArrayOfObjectsToCSV({
+        data: window.wardsArray
+    });
+    if (csv == null) return;
+
+    filename = args.filename || 'export.csv';
+
+    if (!csv.match(/^data:text\/csv/i)) {
+        csv = 'data:text/csv;charset=utf-8,' + csv;
+    }
+    data = encodeURI(csv);
+
+    link = document.createElement('a');
+    link.setAttribute('href', data);
+    link.setAttribute('download', filename);
+    link.click();
 }
 
 initialize();
