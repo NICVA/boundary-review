@@ -115,7 +115,7 @@ info.update = function(props) {
     } else if (props && props.hasOwnProperty('WARDNAME')) {
         this._div.innerHTML = '<h5>Ward: ' + props.WARDNAME + '</h5>';
     } else {
-        this._div.innerHTML = '<h5> Hover over an area </h5>';
+        this._div.innerHTML = '<h5> Hover/click on an area </h5>';
     }
 }
 
@@ -364,6 +364,12 @@ function initialize() {
     tileLayers(proposedMap);
     addConstituencyBounds();
     info.addTo(proposedMap);
+    var control = L.control.layers().addTo(proposedMap);
+
+    var currentConstituenciesLayerGroup = new L.layerGroup()
+      .addLayer(new L.GeoJSON.AJAX('data/current/current.json', {color:'red',fill:false}));
+
+    control.addOverlay(currentConstituenciesLayerGroup, 'Current boundaries').expand();
 }
 
 function clearMap() {
