@@ -173,7 +173,7 @@ function addWardLayer(map, id) {
         onEachFeature: onEachFeatureWards
     });
     geojsonLayer.addTo(map);
-    $("#reset-div").html('<a id="reset-button" class="btn btn-primary btn-lg pull-right" role="button">Reset Map</a>');
+    $("#reset-div").html('<button id="reset-button" class="btn btn-primary btn-lg float-right" role="button">Reset Map</button>');
     $("#reset-button").on({
         click: mapReset
     });
@@ -250,7 +250,7 @@ function loadConstituencies(filepath) {
 
 function genereateConstituencyStats(id, constituencies) {
     var div = proposedStats;
-    var divHTML = '<div id="panel-proposed" class="panel-body">				</div>';
+    var divHTML = '<div id="panel-proposed" class="card-body">				</div>';
     div.replaceWith(divHTML);
     Papa.parse('data/proposed_constituencies.csv', {
         download: true,
@@ -260,7 +260,7 @@ function genereateConstituencyStats(id, constituencies) {
             for (i = 0; i < constituencies.length; i++) {
                 var constituency = constituencies[i];
                 if (constituency.constituencycode == id) {
-                    document.getElementById('panel-proposed').innerHTML = '<h3>' + constituency.constituencyname + ' <span class="badge">' + constituency.electors + ' electors</span></h3></br><h5><strong><abbr title="The number of electors difference with the mandated UK quota">Difference with UK quota</abbr></strong> ' + constituency.diff + '</h5><h5><strong><abbr title="The percentage difference of the number of electors with the mandated UK quota. The maximum is +/- 5%">Percentage Difference</abbr></strong> ' + constituency.percentdiff + '%</h5>';
+                    document.getElementById('panel-proposed').innerHTML = '<h3>' + constituency.constituencyname + ' <span class="badge badge-primary">' + constituency.electors + ' electors</span></h3></br><h5><strong><abbr title="The number of electors difference with the mandated UK quota">Difference with UK quota</abbr></strong> ' + constituency.diff + '</h5><h5><strong><abbr title="The percentage difference of the number of electors with the mandated UK quota. The maximum is +/- 5%">Percentage Difference</abbr></strong> ' + constituency.percentdiff + '%</h5>';
                 }
             }
         }
@@ -291,7 +291,7 @@ function findNewWard(gss) {
                     genereateConstituencyStats(id);
                     addGeoLayer(proposedMap, 'data/proposed/' + id + '.json', newConstituencyStyle, onEachFeature);
                     loadWards(id, "data/proposed_wards.csv", proposedWardsAccordion);
-                    $("#reset-div").html('<a id="reset-button" class="btn btn-primary btn-lg pull-right" role="button">Reset Map</a>');
+                    $("#reset-div").html('<button id="reset-button" class="btn btn-primary btn-lg float-right" role="button">Reset Map</button>');
                     $("#reset-button").on({
                         click: mapReset
                     });
@@ -308,7 +308,7 @@ function loadWards(id, filepath, accordion) {
         complete: function(results) {
             var wards = results.data;
 
-            var accordionHTML = '<div class="panel panel-info" id="wards-panel-info">					<div class="panel-heading" role="tab" id="headingOne">					  <h4 class="panel-title">						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">						  Wards in <span id="constituency-name"></span>	(click to expand)				</a> 					  </h4>				</div>		<div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">			<div class="panel-body" id="wards-panel-body"></div>				  <div class="list-group" id="wards-list">	  </div>					</div>				  </div>';
+            var accordionHTML = '<div class="card" id="wards-panel-info">					<div class="card-header" id="headingOne">					  <h5 class="mb-0">     <a class="btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">Wards in <span id="constituency-name"></span>	(click to expand)				</a>   </h5>					  </div>		<div id="collapseOne" class="collapse" aria-labelledby="headingOne">			<div class="card-body" id="wards-panel-body"></div>				  <div class="list-group" id="wards-list">	  </div>					</div>				  </div>';
             accordion.html(accordionHTML);
 
             window.wardsArray = [];
@@ -318,15 +318,15 @@ function loadWards(id, filepath, accordion) {
                 if (ward.constituencycode == id) {
                     window.wardsArray.push(ward);
                     count += 1;
-                    $('#constituency-name').html(ward.constituencyname + ' <span class="badge pull-right">' + count + ' wards</span>');
+                    $('#constituency-name').html(ward.constituencyname + ' <span class="badge badge-primary float-right">' + count + ' wards</span>');
                     if (ward.electors) {
-                        document.getElementById("wards-list").innerHTML += '<li class="list-group-item"><h5>' + ward.wardname + ' <small>' + ward.wardcode + ' </small><span class="badge pull-right" id="ward-electors">' + ward.electors + ' electors</span></h5></li>';
+                        document.getElementById("wards-list").innerHTML += '<li class="list-group-item"><h5>' + ward.wardname + ' <small>' + ward.wardcode + ' </small><span class="badge badge-secondary float-right" id="ward-electors">' + ward.electors + ' electors</span></h5></li>';
                     } else {
                         document.getElementById("wards-list").innerHTML += '<li class="list-group-item"><h5>' + ward.wardname + ' <small>' + ward.wardcode + ' </small></h5></li>';
                     }
                 }
             }
-            document.getElementById("wards-panel-info").innerHTML += '<div class="panel-footer">The Boundary Review is required to use the Ward boundaries in force for the most recent local government elections to draw proposed constituencies. In Northern Ireland these are the 2012 Ward boundaries (of which there are 462 Wards in total). Note that these differ from the wards that match to the <em>current</em> Parliamentary Constituencies, known as the 1992 Ward boundaries (of which there are 582).</div>';
+            document.getElementById("wards-panel-info").innerHTML += '<div class="card-footer">The Boundary Review is required to use the Ward boundaries in force for the most recent local government elections to draw proposed constituencies. In Northern Ireland these are the 2012 Ward boundaries (of which there are 462 Wards in total). Note that these differ from the wards that match to the <em>current</em> Parliamentary Constituencies, known as the 1992 Ward boundaries (of which there are 582).</div>';
 
             $('#wards-panel-body').append('<a id="show-wards" href="#"> Show Wards on map</a> / <a id="download-wards" href="#">Download Wards (Chrome only)</a>');
 						$('#download-wards')

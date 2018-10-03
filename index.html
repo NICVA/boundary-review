@@ -26,9 +26,9 @@
 					<div class="col-md-2"></div>
 					<div class="col-md-8">
 						<div class="input-group input-group-lg" id="postcode-input-group">
-							<span class="input-group-addon">Postcode</span>
+							<div class="input-group-prepend"><span class="input-group-text">Postcode</span></div>
 							<input type="text" class="form-control" placeholder="Postcode" id="postcode-input">
-							<span class="input-group-btn">
+							<span class="input-group-append">
 		        	<button class="btn btn-default" type="submit" id="postcode-button">Go!</button>
 		      	</span>
 						</div>
@@ -54,12 +54,12 @@
 
 				<div class="row">
 					<div id="proposed" class="column">
-						<div class="panel panel-default">
+						<div class="card">
 							<div id="map-proposed" class="map">
 							</div>
-							<div id="panel-proposed" class="panel-body" hidden="true" aria-hidden="true">
+							<div id="panel-proposed" class="card-body" hidden="true" aria-hidden="true">
 							</div>
-							<div class="panel-footer">
+							<div class="card-footer">
 								<p>Under the terms of the <a href="https://www.boundarycommission.org.uk/2018-review">2018 Boundary Review</a>, proposed boundaries have to maintain an 'electoral parity' across the UK. To ensure that there is a similar electorate in each constituency,
 									the number of people registered to vote must be within a range of 5% either side of the UK quota. Based on the number of electors registered on 1 December 2015, this quota is 74,769 electors. New constituencies must therefore have <strong>between 71,031 to 78,507 electors</strong>.
 									For more information, see the <a href="https://www.boundarycommission.org.uk/sites/boundarycommission.org.uk/files/media-files/Provisional%20Proposals%20Report%20-%20September%202016.pdf">September 2016 report</a>.
@@ -68,7 +68,7 @@
 									of Commons Library.</p>
 							</div>
 						</div>
-						<div id="proposed-wards-accordion" class="panel-group" role="tablist" aria-multiselectable="true">
+						<div id="proposed-wards-accordion" class="card-group" role="tablist" aria-multiselectable="true">
 						</div>
 					</div>
 				</div>
@@ -78,7 +78,7 @@
 
 		</div>
 	</div>
-	<footer class="footer" style="background-color:'whitesmoke'">
+<footer class="footer text-muted" style="background-color: #f5f5f5">
 		<div class="container">
 			<div class="row">
 				<div class="col-md-2"></div>
