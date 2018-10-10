@@ -167,7 +167,7 @@ function addGeoLayer(map, filepath, style, onEachFeature) {
 
 function addWardLayer(map, id) {
     clearMap();
-    var filepath = 'data/proposed/wards/' + id + '.json';
+    var filepath = 'data/final/wards/' + id + '.json';
     window.geojsonLayer = new L.GeoJSON.AJAX(filepath, {
         style: wardsStyle,
         onEachFeature: onEachFeatureWards
@@ -252,7 +252,7 @@ function genereateConstituencyStats(id, constituencies) {
     var div = proposedStats;
     var divHTML = '<div id="panel-proposed" class="card-body">				</div>';
     div.replaceWith(divHTML);
-    Papa.parse('data/proposed_constituencies.csv', {
+    Papa.parse('data/final_constituencies.csv', {
         download: true,
         header: true,
         complete: function(results) {
@@ -260,11 +260,16 @@ function genereateConstituencyStats(id, constituencies) {
             for (i = 0; i < constituencies.length; i++) {
                 var constituency = constituencies[i];
                 if (constituency.constituencycode == id) {
-                    document.getElementById('panel-proposed').innerHTML = '<h3>' + constituency.constituencyname + ' <span class="badge badge-primary">' + constituency.electors + ' electors</span></h3></br><h5><strong><abbr title="The number of electors difference with the mandated UK quota">Difference with UK quota</abbr></strong> ' + constituency.diff + '</h5><h5><strong><abbr title="The percentage difference of the number of electors with the mandated UK quota. The maximum is +/- 5%">Percentage Difference</abbr></strong> ' + constituency.percentdiff + '%</h5>';
+                    document.getElementById('panel-proposed').innerHTML = '<h3>' + constituency.constituencyname + ' <span class="badge badge-' + diffSize(constituency.percentdiff) + '">' + constituency.electors + ' electors</span></h3></br><h5><strong><abbr title="The number of electors difference with the mandated UK quota">Difference with UK quota</abbr></strong> ' + constituency.diff + '</h5><h5><strong><abbr title="The percentage difference of the number of electors with the mandated UK quota. The maximum is +/- 5%">Percentage Difference</abbr></strong> ' + constituency.percentdiff + '%</h5>';
                 }
             }
         }
     });
+}
+
+function diffSize(variance) {
+    console.log(variance)
+    return(variance > -5 && variance < 5 ? "primary" : "warning")
 }
 
 function fillConstituencyDropdown(constituencies) {
@@ -277,7 +282,7 @@ function fillConstituencyDropdown(constituencies) {
 }
 
 function findNewWard(gss) {
-    Papa.parse("data/proposed_wards.csv", {
+    Papa.parse("data/final_wards.csv", {
         download: true,
         header: true,
         complete: function(results) {
@@ -289,8 +294,8 @@ function findNewWard(gss) {
                     id = value.constituencycode;
                     $('#which-constituencies').append('<h3><small><abbr title="The constituency area provisionally proposed by the Boundary Commission NI in September 2016, subject to final decision after public consultation">New Constituency</abbr>: </small>' + proposedCon + ' (blue)</h3>Scroll down for more info about the new constituency');
                     genereateConstituencyStats(id);
-                    addGeoLayer(proposedMap, 'data/proposed/' + id + '.json', newConstituencyStyle, onEachFeature);
-                    loadWards(id, "data/proposed_wards.csv", proposedWardsAccordion);
+                    addGeoLayer(proposedMap, 'data/final/' + id + '.json', newConstituencyStyle, onEachFeature);
+                    loadWards(id, "data/final_wards.csv", proposedWardsAccordion);
                     $("#reset-div").html('<button id="reset-button" class="btn btn-primary btn-lg float-right" role="button">Reset Map</button>');
                     $("#reset-button").on({
                         click: mapReset
@@ -357,7 +362,7 @@ function selectConstituency(id, istrue) {
         });
     }
     genereateConstituencyStats(id);
-    loadWards(id, "data/proposed_wards.csv", proposedWardsAccordion);
+    loadWards(id, "data/final_wards.csv", proposedWardsAccordion);
 }
 
 function initialize() {
@@ -382,7 +387,7 @@ function clearMap() {
 
 function addConstituencyBounds() {
     for (i = 1; i < 18; i++) {
-        addGeoLayer(proposedMap, 'data/proposed/' + i + '.json', layerStyle, onEachFeature);
+        addGeoLayer(proposedMap, 'data/final/' + i + '.json', layerStyle, onEachFeature);
     }
 }
 
